@@ -8,6 +8,7 @@ export interface TerminalLine {
   text: string;
   content?: React.ReactNode; // For rendering custom components
   timestamp: Date;
+  prompt?: string;
 }
 
 /** A simplified input version without id/timestamp. */
@@ -27,7 +28,7 @@ export interface Command {
   description: string;
   execute: (
     args: string[],
-    engine: TerminalEngine
+    engine: TerminalEngine,
   ) => Promise<
     void | TerminalLineInput | TerminalLineInput[] | AwaitEventSignal
   >;

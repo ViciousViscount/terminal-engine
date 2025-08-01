@@ -1,26 +1,24 @@
-import { useMemo } from "react";
-import { TerminalEngine } from "./features/terminal/TerminalEngine";
-import { TerminalProvider } from "./features/terminal/context/TerminalContext";
-import TerminalWindow from "./features/terminal/components/TerminalWindow";
+import "./App.css";
+
+import { Terminal } from "./features/terminal/Terminal";
 
 function App() {
-  // Memoize the engine so it persists for the app's lifetime
-  const terminalEngine = useMemo(() => new TerminalEngine(), []);
-
   return (
-    <TerminalProvider engine={terminalEngine}>
-      <div style={{ maxWidth: 700, margin: "40px auto", padding: 24 }}>
-        <h1>My App with an Interactive Terminal</h1>
-        <p>
-          Type <b>help</b> in the terminal to see commands.
-        </p>
-        <p>
-          Try typing <b>confirm</b> and then clicking the confirm button that
-          appears.
-        </p>
-        <TerminalWindow engine={terminalEngine} />
+    <>
+      <div>
+        {/* You can keep your react logo or any other header content */}
       </div>
-    </TerminalProvider>
+      <h1>React Terminal Engine</h1>
+      <div className="card">
+        {/*
+          It's a self-contained unit that requires no props.
+        */}
+        <Terminal />
+      </div>
+      <p className="read-the-docs">
+        A standalone terminal component built with React and TypeScript.
+      </p>
+    </>
   );
 }
 

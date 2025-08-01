@@ -1,34 +1,19 @@
-import { useState, useEffect } from "react";
-import { TerminalEngine } from "../TerminalEngine";
-import { EngineState, TerminalLine } from "../types";
+import { useContext } from "react";
+import { TerminalContext } from "../context/TerminalProvider";
 
-export const useTerminal = (engine: TerminalEngine) => {
-  const [lines, setLines] = useState<readonly TerminalLine[]>(
-    engine.getLines()
-  );
-  const [engineState, setEngineState] = useState<EngineState>(
-    engine.getEngineState()
-  );
+/**
+ * A hook to access the terminal's state and methods.
+ * It consumes the TerminalContext provided by TerminalProvider.
+ * It no longer accepts any arguments.
+ */
+export const useTerminal = () => {
+  const context = useContext(TerminalContext);
 
-  useEffect(() => {
-    const handleUpdate = () => {
-      setLines([...engine.getLines()]);
-      setEngineState(engine.getEngineState());
-    };
+  // This check ensures the hook is used within a provider, preventing common errors.
+  if (context === undefined) {
+    throw new Error("useTerminal must be used within a TerminalProvider");
+  }
 
-    engine.on("update", handleUpdate);
-
-    // ✅ Proper cleanup function
-    return () => {
-      engine.off("update", handleUpdate);
-    };
-  }, [engine]);
-
-  return {
-    lines,
-    engineState,
-    submit: engine.submit.bind(engine),
-    getPreviousCommand: engine.getPreviousCommand.bind(engine),
-    getNextCommand: engine.getNextCommand.bind(engine),
-  };
+  // The hook simply returns the value that the provider has already prepared.
+  return context;
 };

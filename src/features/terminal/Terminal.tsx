@@ -1,116 +1,41 @@
-import React, { useState, useRef, useEffect } from "react";
-import { useTerminal } from "./hooks/useTerminal";
+import { useMemo } from "react";
+
+// Import the headless engines
 import { TerminalEngine } from "./TerminalEngine";
-import { TerminalLine } from "./types";
+import { SettingsEngine } from "./settings/SettingsEngine";
 
-// In a real app, these would be separate component files
-const TerminalWindow: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => (
-  <div
-    style={{
-      border: "1px solid #555",
-      background: "#222",
-      color: "#eee",
-      fontFamily: "monospace",
-      height: "400px",
-      display: "flex",
-      flexDirection: "column",
-    }}
-  >
-    {children}
-  </div>
-);
+// Import the context providers
+import { TerminalProvider } from "./context/TerminalProvider"; // Assuming you create this provider
+import { SettingsProvider } from "./settings/context/SettingsProvider";
 
-const TerminalOutput: React.FC<{ lines: readonly TerminalLine[] }> = ({
-  lines,
-}) => {
-  const endRef = useRef<null | HTMLDivElement>(null);
-  useEffect(
-    () => endRef.current?.scrollIntoView({ behavior: "smooth" }),
-    [lines],
+// Import the main UI window component
+import { TerminalWindow } from "./components/TerminalWindow";
+
+/**
+ * The root component for the Terminal feature.
+ *
+ * Responsibilities:
+ * 1. Instantiate the headless engines (`TerminalEngine`, `SettingsEngine`).
+ * 2. Wire up dependencies (e.g., passing the settings engine to the terminal engine).
+ * 3. Set up the React Context Providers to make the engines and state available
+ *    to all child components.
+ *
+ * It is now a self-contained unit that can be dropped into any application.
+ */
+export const Terminal = () => {
+  // Instantiate engines once using useMemo to ensure they persist across re-renders.
+  const settingsEngine = useMemo(() => new SettingsEngine(), []);
+  const terminalEngine = useMemo(
+    () => new TerminalEngine(settingsEngine),
+    [settingsEngine],
   );
 
   return (
-    <div style={{ flex: 1, overflowY: "auto", padding: "10px" }}>
-      {lines.map((line) => (
-        <div
-          key={line.id}
-          style={{
-            color:
-              line.type === "error"
-                ? "red"
-                : line.type === "input"
-                  ? "cyan"
-                  : "inherit",
-          }}
-        >
-          {line.type === "input" && "> "}
-          {line.text}
-        </div>
-      ))}
-      <div ref={endRef} />
-    </div>
-  );
-};
-
-const TerminalInput: React.FC<{
-  onSubmit: (text: string) => void;
-  onArrowUp: () => string;
-  onArrowDown: () => string;
-  disabled: boolean;
-}> = (props) => {
-  const [value, setValue] = useState("");
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      props.onSubmit(value);
-      setValue("");
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setValue(props.onArrowUp());
-    } else if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setValue(props.onArrowDown());
-    }
-  };
-
-  return (
-    <div style={{ display: "flex", padding: "5px" }}>
-      <span>&gt;</span>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onKeyDown={handleKeyDown}
-        disabled={props.disabled}
-        style={{
-          background: "transparent",
-          border: "none",
-          color: "#eee",
-          flex: 1,
-          outline: "none",
-          marginLeft: "5px",
-        }}
-        autoFocus
-      />
-    </div>
-  );
-};
-
-// The main component
-export const Terminal = ({ engine }: { engine: TerminalEngine }) => {
-  const { lines, engineState, submit, getPreviousCommand, getNextCommand } =
-    useTerminal(engine);
-  return (
-    <TerminalWindow>
-      <TerminalOutput lines={lines} />
-      <TerminalInput
-        onSubmit={submit}
-        onArrowUp={getPreviousCommand}
-        onArrowDown={getNextCommand}
-        disabled={engineState !== "IDLE"}
-      />
-    </TerminalWindow>
+    // The Providers wrap the UI, making engine instances and state available via hooks.
+    <TerminalProvider engine={terminalEngine}>
+      <SettingsProvider engine={settingsEngine}>
+        <TerminalWindow />
+      </SettingsProvider>
+    </TerminalProvider>
   );
 };
