@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "composite": true
+    // You can override specific settings for app code here if needed
+  },
+  "include": ["src"]
+}
