@@ -1,3 +1,5 @@
+// src/features/terminal/settings/SettingsEngine.ts
+
 import { TerminalSettings, SettingChangeEvent } from "./types";
 import EventEmitter from "eventemitter3";
 
@@ -6,7 +8,7 @@ const DEFAULT_SETTINGS: TerminalSettings = {
   fontFamily: '"Fira Code", monospace',
   fontSize: 14,
   promptSymbol: "$",
-  showTimestamp: false,
+  showTimestamp: true, // Added
 };
 
 export class SettingsEngine extends EventEmitter {
@@ -35,41 +37,27 @@ export class SettingsEngine extends EventEmitter {
     try {
       localStorage.setItem(this.storageKey, JSON.stringify(this.settings));
     } catch (error) {
-      // FIX: The try...catch block is now complete.
       console.error("Failed to save settings to storage:", error);
     }
   }
 
-  // --- Public API Methods ---
-
-  /**
-   * Returns a copy of all current settings.
-   */
   public getAll(): TerminalSettings {
     return { ...this.settings };
   }
 
-  /**
-   * Returns the value of a single setting.
-   */
   public get<K extends keyof TerminalSettings>(key: K): TerminalSettings[K] {
     return this.settings[key];
   }
 
-  /**
-   * Updates a setting, saves it to storage, and emits an event.
-   */
   public set<K extends keyof TerminalSettings>(
     key: K,
     value: TerminalSettings[K],
   ): void {
-    if (this.settings[key] === value) return; // No change, do nothing
+    if (this.settings[key] === value) return;
 
     this.settings[key] = value;
     this.saveToStorage();
 
-    // FIX: This section uses the `key`, `value`, and `SettingChangeEvent` type,
-    // resolving the "declared but not read" warnings.
     const event: SettingChangeEvent<K> = { key, value };
     this.emit("settings:changed", event);
   }

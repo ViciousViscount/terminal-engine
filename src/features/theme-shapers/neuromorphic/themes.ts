@@ -1,0 +1,93 @@
+// src/features/theme-shapers/neuromorphic/themes.ts
+
+import { NeuromorphicTheme } from "./types";
+
+export const darkMatteTheme: NeuromorphicTheme = {
+  themeType: "neuromorphic",
+  elevation: 10,
+  borderRadius: 12,
+  bevelSize: 4,
+  bevelAngle: 45,
+  concave: false,
+  lightSourceAngle: 135,
+  shadowBlur: 20,
+  shadowSpread: 5,
+  shadowIntensity: 0.15,
+  highlightIntensity: 0.05,
+  lightFalloff: 0.5,
+  lightDispersion: 0.2,
+  shadowOffsetMultiplier: 0.8,
+  dualLightSource: false,
+  material: "matte",
+  surfaceRoughness: 0.8,
+  reflectivity: 0.1,
+  metalness: 0,
+  baseColor: "#282a36",
+  shadowColor: "rgba(0,0,0,0.5)",
+  highlightColor: "rgba(255,255,255,0.07)",
+  accent: "#bd93f9",
+  lightColor: "#ffffff",
+  gradientOverlay: false,
+  innerShadow: false,
+  innerGlow: false,
+  softBorder: false,
+  surfaceNoise: { opacity: 0.03, scale: 1 },
+  subsurfaceScattering: false,
+  animationPreset: "spring",
+  isometricOffset: 0,
+  depthColorCurve: null,
+  linkedColors: true,
+  elevationCurve: "ease-out-quad",
+  interactions: {
+    hover: { elevation: 15, shadowIntensity: 0.2 },
+    active: {
+      elevation: 5,
+      concave: true,
+      innerShadow: {
+        offsetX: 2,
+        offsetY: 2,
+        blur: 5,
+        color: "rgba(0,0,0,0.4)",
+      },
+    },
+  },
+  backgroundBlur: false,
+  gridBackground: {
+    color: "rgba(255, 255, 255, 0.05)",
+    size: 50,
+    lineWidth: 1,
+  },
+  fontFamily: '"Inter", sans-serif',
+  fontWeight: 400,
+  promptSymbol: undefined,
+};
+
+export const lightGlossyTheme: NeuromorphicTheme = {
+  ...darkMatteTheme, // Start with the dark theme and override properties
+  themeType: "neuromorphic",
+  concave: false,
+  shadowIntensity: 0.1,
+  highlightIntensity: 0.3,
+  material: "glossy",
+  surfaceRoughness: 0.2,
+  reflectivity: 0.7,
+  baseColor: "#e0e5ec",
+  shadowColor: "rgba(163, 177, 198, 0.6)",
+  highlightColor: "rgba(255, 255, 255, 0.8)",
+  accent: "#007bff",
+  surfaceNoise: { opacity: 0.01, scale: 1.5 },
+  interactions: {
+    hover: { elevation: 12, shadowIntensity: 0.15 },
+    active: {
+      elevation: 3,
+      concave: true,
+      innerShadow: {
+        offsetX: 1,
+        offsetY: 1,
+        blur: 4,
+        color: "rgba(163, 177, 198, 0.5)",
+      },
+    },
+  },
+  gridBackground: { color: "rgba(0, 0, 0, 0.08)", size: 40, lineWidth: 1 },
+};

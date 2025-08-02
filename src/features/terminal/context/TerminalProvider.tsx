@@ -1,8 +1,6 @@
 import { useState, useEffect, ReactNode, useMemo } from "react";
 import { TerminalEngine } from "../TerminalEngine";
 import { TerminalLine, EngineState } from "../types";
-
-// FIX: Import the context object from our new file.
 import { TerminalContext, TerminalContextValue } from "./terminal.context";
 
 interface TerminalProviderProps {
@@ -10,13 +8,10 @@ interface TerminalProviderProps {
   engine: TerminalEngine;
 }
 
-// This file now ONLY exports the provider component, satisfying the lint rule.
 export const TerminalProvider = ({
   children,
   engine,
 }: TerminalProviderProps) => {
-  // The state now lives inside the provider.
-  // FIX: Added getLines() and getState() to initialize state from the engine.
   const [lines, setLines] = useState<readonly TerminalLine[]>(() =>
     engine.getLines(),
   );
@@ -25,8 +20,16 @@ export const TerminalProvider = ({
   );
 
   useEffect(() => {
-    const handleLinesChange = (newLines: readonly TerminalLine[]) =>
-      setLines(newLines);
+    const handleLinesChange = (newLines: readonly TerminalLine[]) => {
+      // DEBUG: Log that the event handler has been triggered.
+      console.log(
+        `%cPROVIDER: handleLinesChange triggered. Received ${newLines.length} lines.`,
+        "color: lightblue;",
+      );
+      // The definitive fix for immutable updates at the boundary.
+      setLines([...newLines]);
+    };
+
     const handleStateChange = (newState: EngineState) =>
       setEngineState(newState);
 
@@ -38,6 +41,12 @@ export const TerminalProvider = ({
       engine.off("state-changed", handleStateChange);
     };
   }, [engine]);
+
+  // DEBUG: Log whenever the provider itself re-renders.
+  console.log(
+    `%cPROVIDER: Re-rendering with ${lines.length} lines.`,
+    "color: lightblue; font-weight: bold;",
+  );
 
   const value: TerminalContextValue = useMemo(
     () => ({
@@ -57,4 +66,3 @@ export const TerminalProvider = ({
     </TerminalContext.Provider>
   );
 };
-export { TerminalContext };

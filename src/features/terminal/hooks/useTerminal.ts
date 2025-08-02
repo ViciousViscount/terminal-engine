@@ -1,19 +1,21 @@
 import { useContext } from "react";
-import { TerminalContext } from "../context/TerminalProvider";
+import {
+  TerminalContext,
+  TerminalContextValue,
+} from "../context/terminal.context";
 
 /**
  * A hook to access the terminal's state and methods.
- * It consumes the TerminalContext provided by TerminalProvider.
- * It no longer accepts any arguments.
+ *
+ * THE FIX: This file uses `export const` to create a named export.
+ * This will match the `import { useTerminal }` statement in TerminalWindow.tsx.
  */
-export const useTerminal = () => {
+export const useTerminal = (): TerminalContextValue => {
   const context = useContext(TerminalContext);
 
-  // This check ensures the hook is used within a provider, preventing common errors.
   if (context === undefined) {
     throw new Error("useTerminal must be used within a TerminalProvider");
   }
 
-  // The hook simply returns the value that the provider has already prepared.
   return context;
 };

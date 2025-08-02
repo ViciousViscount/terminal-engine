@@ -1,41 +1,32 @@
-import React, { useState, useRef, useEffect } from "react";
+// src/features/terminal/components/TerminalInput.tsx
 
-/**
- * The props for the TerminalInput component.
- * It's designed to be a "controlled" and "presentational" component.
- * It receives all its data and behavior via props.
- */
+import React, { useState, useRef, useEffect } from "react";
+import { useTheme } from "../../theme/useTheme";
+import { NeuromorphicSurface } from "../../theme/components/NeuromorphicSurface";
+import { NeuromorphicTheme } from "../../theme-shapers/neuromorphic";
+
+// THE FIX #1: The `promptSymbol` prop is removed from the interface.
 interface TerminalInputProps {
-  /** The function to call when the user submits a command. */
   onSubmit: (text: string) => void;
-  /** The function to call to get the previous command from history. */
   onArrowUp: () => string;
-  /** The function to call to get the next command from history. */
   onArrowDown: () => string;
-  /** Whether the input should be disabled (e.g., while a command is running). */
   disabled: boolean;
-  /** The symbol to display as the prompt (e.g., '$', '>'). */
-  promptSymbol: string;
 }
 
-/**
- * A presentational component for the terminal's input line.
- * It manages its own text state but relies on props for all external interactions.
- * It has no knowledge of the TerminalEngine or any hooks.
- */
 const TerminalInput: React.FC<TerminalInputProps> = ({
   onSubmit,
   onArrowUp,
   onArrowDown,
   disabled,
-  promptSymbol,
 }) => {
-  // This component still manages its own internal input value.
   const [value, setValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // This effect ensures the input is always focused when it's not disabled.
-  // This is a good example of a UI concern that belongs in this component.
+  // THE FIX #2: Get the active theme to access its properties.
+  const { activeTheme } = useTheme();
+  // We can safely cast here and provide a fallback.
+  const promptSymbol = (activeTheme as NeuromorphicTheme)?.promptSymbol || ">";
+
   useEffect(() => {
     if (!disabled) {
       inputRef.current?.focus();
@@ -46,43 +37,42 @@ const TerminalInput: React.FC<TerminalInputProps> = ({
     if (e.key === "Enter") {
       e.preventDefault();
       if (value.trim()) {
-        // Use the `onSubmit` callback prop.
         onSubmit(value);
         setValue("");
       }
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      // Use the `onArrowUp` callback prop to fetch and set the value.
       setValue(onArrowUp());
     } else if (e.key === "ArrowDown") {
       e.preventDefault();
-      // Use the `onArrowDown` callback prop.
       setValue(onArrowDown());
     }
   };
 
+  const inputSurfaceOverrides: Partial<NeuromorphicTheme> = {
+    concave: true,
+    elevation: 3,
+    borderRadius: 8,
+  };
+
   return (
-    <div style={{ display: "flex", padding: "5px" }}>
-      {/* The prompt is now dynamic via props. */}
-      <span>{promptSymbol}&nbsp;</span>
+    <NeuromorphicSurface
+      styleOverrides={inputSurfaceOverrides}
+      className="flex items-center p-2 m-2"
+    >
+      {/* THE FIX #3: The prompt symbol now comes from the variable derived from the theme. */}
+      <span style={{ marginRight: "0.5em" }}>{promptSymbol}</span>
       <input
         ref={inputRef}
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onKeyDown={handleKeyDown}
-        // The disabled state is now directly controlled by the prop.
         disabled={disabled}
-        style={{
-          background: "transparent",
-          border: "none",
-          color: "#eee",
-          flex: 1,
-          outline: "none",
-        }}
-        // 'autoFocus' is good, but the useEffect provides more robust focus management.
+        className="flex-1 bg-transparent border-none outline-none"
+        style={{ color: (activeTheme as NeuromorphicTheme)?.accent || "#eee" }}
       />
-    </div>
+    </NeuromorphicSurface>
   );
 };
 

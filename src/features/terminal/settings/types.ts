@@ -1,13 +1,13 @@
-// Define the shape of your settings
+// src/features/terminal/settings/types.ts
+
 export interface TerminalSettings {
   theme: "light" | "dark" | "custom";
   fontFamily: string;
   fontSize: number;
   promptSymbol: string;
-  showTimestamp: boolean;
+  showTimestamp: boolean; // Added
 }
 
-// Define the event payload for when a setting changes
 export interface SettingChangeEvent<K extends keyof TerminalSettings> {
   key: K;
   value: TerminalSettings[K];

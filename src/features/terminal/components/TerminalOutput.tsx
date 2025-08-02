@@ -1,73 +1,90 @@
-import React, { useRef, useEffect } from "react";
-import { TerminalLine } from "../types";
+// src/features/terminal/components/TerminalOutput.tsx
 
-/**
- * The props for the TerminalOutput component.
- * It is a presentational component that only needs the data to display.
- */
+import React from "react";
+import { TerminalLine } from "../types";
+import { useAutoScroll } from "../auto-scroll";
+import { useTheme } from "../../theme/useTheme";
+import { NeuromorphicTheme } from "../../theme-shapers/neuromorphic";
+import { useTerminalSettings } from "../settings/context/useTerminalSettings";
+
 interface TerminalOutputProps {
-  /** The array of terminal lines to be rendered. Passed from a parent component. */
   lines: readonly TerminalLine[];
-  /**
-   * An optional custom render function for a line.
-   * The function receives the line data and should return a React node.
-   * This allows for powerful UI customization.
-   */
   renderLine?: (line: TerminalLine) => React.ReactNode;
 }
 
-/**
- * A presentational component responsible for rendering the list of terminal output lines.
- * It manages its own scrolling behavior but receives all content via props.
- * It has no knowledge of the TerminalEngine.
- */
 const TerminalOutput: React.FC<TerminalOutputProps> = ({
   lines,
   renderLine,
 }) => {
-  // This ref is used to control the auto-scrolling behavior.
-  const endRef = useRef<HTMLDivElement | null>(null);
+  const endRef = useAutoScroll<HTMLDivElement>({ dependency: lines.length });
+  const { activeTheme } = useTheme();
+  const { settings } = useTerminalSettings();
 
-  // This effect scrolls the view to the bottom whenever the `lines` array changes.
-  // This is a UI concern and correctly belongs in this component.
-  useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [lines]);
+  const theme = activeTheme as NeuromorphicTheme;
+  const colors = {
+    text: "inherit",
+    input: theme?.accent || "#50fa7b",
+    error: "#ff5555",
+    log: theme?.lightColor || "#8be9fd",
+    warn: "#f1fa8c",
+  };
+
+  const renderSourcePrefix = (line: TerminalLine) => {
+    if (line.source.type === "external") {
+      return `[${line.source.sourceName.toUpperCase()}] `;
+    }
+    return null;
+  };
 
   return (
     <div style={{ flex: 1, overflowY: "auto", padding: "10px" }}>
       {lines.map((line) => (
-        // The key MUST be here, on the top-level element inside the map.
         <div key={line.id}>
           {renderLine ? (
-            // If a custom renderer is provided, use it.
             renderLine(line)
           ) : (
-            // Otherwise, use the default rendering logic.
-            // The wrapping div with the key is already handled above.
-            <p
+            <div
               style={{
-                margin: 0, // Use <p> for better semantics, remove default margin.
+                display: "flex",
+                flexDirection: "row",
                 color:
                   line.type === "error"
-                    ? "red"
+                    ? colors.error
                     : line.type === "input"
-                      ? "cyan"
-                      : line.type === "system"
-                        ? "#8be9fd"
-                        : "inherit",
+                      ? colors.input
+                      : line.type === "log"
+                        ? colors.log
+                        : line.type === "warn"
+                          ? colors.warn
+                          : colors.text,
               }}
             >
-              {line.type === "input" && <span>&gt;&nbsp;</span>}
-              {
-                /* Using optional chaining for safety, same as your original ?? */
-                line.content
-              }
-            </p>
+              {settings.showTimestamp && (
+                <span
+                  style={{
+                    marginRight: "1em",
+                    opacity: 0.6,
+                    userSelect: "none",
+                  }}
+                >
+                  {line.timestamp.toLocaleTimeString()}
+                </span>
+              )}
+
+              {line.type === "input" && (
+                <span style={{ marginRight: "0.5em" }}>
+                  {line.prompt || ">"}
+                </span>
+              )}
+
+              <span style={{ whiteSpace: "pre-wrap" }}>
+                <strong>{renderSourcePrefix(line)}</strong>
+                {line.text}
+              </span>
+            </div>
           )}
         </div>
       ))}
-      {/* This invisible div is the target for our auto-scroll effect. */}
       <div ref={endRef} />
     </div>
   );
