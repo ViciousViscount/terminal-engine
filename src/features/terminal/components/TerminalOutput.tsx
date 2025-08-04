@@ -23,7 +23,7 @@ const TerminalOutput: React.FC<TerminalOutputProps> = ({
   const theme = activeTheme as NeuromorphicTheme;
   const colors = {
     text: "inherit",
-    input: theme?.accent || "#50fa7b",
+    input: theme?.accent || "var(--terminal-accent-color, #50fa7b)",
     error: "#ff5555",
     log: theme?.lightColor || "#8be9fd",
     warn: "#f1fa8c",

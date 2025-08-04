@@ -1,5 +1,20 @@
 /* src/index.css */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* 1. Default Theme (Dark) using OKLCH */
+:root {
+  /*
+    L: Lightness (0% black, 100% white)
+    C: Chroma (0 grey, ~0.4 vibrant)
+    H: Hue (0-360 degrees)
+  */
+  --color-accent: 0.7 0.25 300; /* Vibrant Purple */
+}
+
+/* 2. Light Theme Definition using OKLCH */
+.theme-light {
+  /* THE FIX: By using OKLCH, we can create a high-contrast, legible light theme. */
+  --color-accent: 0.5 0.22 250; /* Vibrant Blue */
+}

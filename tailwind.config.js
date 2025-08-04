@@ -6,6 +6,7 @@ export default {
       colors: {
         primary: "#1DA1F2",
         secondary: "#14171A",
+        accent: "oklch(var(--color-accent) / <alpha-value>)",
       },
       fontFamily: {
         sans: ["Inter", "sans-serif"],

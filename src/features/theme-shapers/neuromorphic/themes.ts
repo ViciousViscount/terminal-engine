@@ -4,6 +4,14 @@ import { NeuromorphicTheme } from "./types";
 
 export const darkMatteTheme: NeuromorphicTheme = {
   themeType: "neuromorphic",
+  baseColor: "#282a36",
+  surfaceColor: "#343746",
+  shadowColor: "rgba(0,0,0,0.5)",
+  highlightColor: "rgba(255,255,255,0.07)",
+  accent: "#bd93f9",
+  lightColor: "#ffffff",
+  textColor: "#f8f8f2",
+
   elevation: 10,
   borderRadius: 12,
   bevelSize: 4,
@@ -22,11 +30,6 @@ export const darkMatteTheme: NeuromorphicTheme = {
   surfaceRoughness: 0.8,
   reflectivity: 0.1,
   metalness: 0,
-  baseColor: "#282a36",
-  shadowColor: "rgba(0,0,0,0.5)",
-  highlightColor: "rgba(255,255,255,0.07)",
-  accent: "#bd93f9",
-  lightColor: "#ffffff",
   gradientOverlay: false,
   innerShadow: false,
   innerGlow: false,
@@ -63,18 +66,21 @@ export const darkMatteTheme: NeuromorphicTheme = {
 };
 
 export const lightGlossyTheme: NeuromorphicTheme = {
-  ...darkMatteTheme, // Start with the dark theme and override properties
+  ...darkMatteTheme,
   themeType: "neuromorphic",
+  baseColor: "#e0e5ec",
+  surfaceColor: "#d1d9e6",
+  shadowColor: "rgba(163, 177, 198, 0.6)",
+  highlightColor: "rgba(255, 255, 255, 0.8)",
+  accent: "#007bff",
+  lightColor: "#333333",
+  textColor: "#3b4d61",
   concave: false,
   shadowIntensity: 0.1,
   highlightIntensity: 0.3,
   material: "glossy",
   surfaceRoughness: 0.2,
   reflectivity: 0.7,
-  baseColor: "#e0e5ec",
-  shadowColor: "rgba(163, 177, 198, 0.6)",
-  highlightColor: "rgba(255, 255, 255, 0.8)",
-  accent: "#007bff",
   surfaceNoise: { opacity: 0.01, scale: 1.5 },
   interactions: {
     hover: { elevation: 12, shadowIntensity: 0.15 },

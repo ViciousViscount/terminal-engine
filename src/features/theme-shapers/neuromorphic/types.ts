@@ -81,10 +81,12 @@ export interface NeuromorphicTheme {
 
   // Colors
   baseColor: string;
+  surfaceColor: string;
   shadowColor: string;
   highlightColor: string;
   accent: string;
   lightColor: string;
+  textColor: string;
 
   // Advanced Effects
   gradientOverlay: GradientOverlayConfig | false;

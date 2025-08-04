@@ -1,11 +1,14 @@
 // src/features/terminal/settings/types.ts
 
 export interface TerminalSettings {
-  theme: "light" | "dark" | "custom";
   fontFamily: string;
   fontSize: number;
   promptSymbol: string;
-  showTimestamp: boolean; // Added
+  showTimestamp: boolean;
+  lineHeight: number;
+  baseColor: string;
+  textColor: string;
+  accentColor: string;
 }
 
 export interface SettingChangeEvent<K extends keyof TerminalSettings> {

@@ -37,15 +37,13 @@ export function generateNeuromorphicStyles(
   const styles: CSSProperties = {
     // Add a basic transition for any future interactive effects.
     transition: "all 0.2s ease-in-out",
+    color: theme.textColor,
   };
 
   // --- 1. Handle Shape and Basic Color ---
-  if (theme.borderRadius !== undefined) {
+  if (theme.borderRadius !== undefined)
     styles.borderRadius = `${theme.borderRadius}px`;
-  }
-  if (theme.baseColor) {
-    styles.backgroundColor = theme.baseColor;
-  }
+  if (theme.baseColor) styles.backgroundColor = theme.baseColor;
 
   // --- 2. Handle Elevation, Light, and Shadow ---
   if (theme.elevation !== undefined) {

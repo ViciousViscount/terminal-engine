@@ -1,16 +1,21 @@
 // src/features/terminal/settings/SettingsEngine.ts
 
-import { TerminalSettings, SettingChangeEvent } from "./types";
+import { TerminalSettings } from "./types";
 import EventEmitter from "eventemitter3";
 
 const DEFAULT_SETTINGS: TerminalSettings = {
-  theme: "dark",
   fontFamily: '"Fira Code", monospace',
   fontSize: 14,
   promptSymbol: "$",
-  showTimestamp: true, // Added
+  showTimestamp: true,
+  lineHeight: 1.5,
+  // Storing colors as HEX is best for state management and color pickers.
+  baseColor: "#282a36",
+  textColor: "#f8f8f2",
+  accentColor: "#bd93f9",
 };
 
+// The SettingsEngine class remains unchanged from the previous full version.
 export class SettingsEngine extends EventEmitter {
   private settings: TerminalSettings;
   private storageKey: string;
@@ -54,11 +59,8 @@ export class SettingsEngine extends EventEmitter {
     value: TerminalSettings[K],
   ): void {
     if (this.settings[key] === value) return;
-
     this.settings[key] = value;
     this.saveToStorage();
-
-    const event: SettingChangeEvent<K> = { key, value };
-    this.emit("settings:changed", event);
+    this.emit("settings:changed", { key, value });
   }
 }
