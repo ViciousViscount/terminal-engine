@@ -1,29 +1,25 @@
+// src/features/terminal/settings/context/SettingsProvider.tsx
+
 import { useState, useEffect, ReactNode, useMemo } from "react";
 import { SettingsEngine } from "../SettingsEngine";
-import { TerminalSettings, SettingChangeEvent } from "../types";
-
-// Import the context object from our new file.
+import { TerminalSettings } from "../types";
 import { SettingsContext, SettingsContextValue } from "./settings.context";
 
-interface SettingsProviderProps {
-  children: ReactNode;
-  engine: SettingsEngine;
-}
-
-// This file now only exports the provider, satisfying the linter.
 export const SettingsProvider = ({
   children,
   engine,
-}: SettingsProviderProps) => {
+}: {
+  children: ReactNode;
+  engine: SettingsEngine;
+}) => {
   const [settings, setSettings] = useState<TerminalSettings>(() =>
     engine.getAll(),
   );
 
   useEffect(() => {
-    const handleSettingsChange = (event: SettingChangeEvent<any>) => {
-      setSettings((prev) => ({ ...prev, [event.key]: event.value }));
+    const handleSettingsChange = () => {
+      setSettings({ ...engine.getAll() });
     };
-
     engine.on("settings:changed", handleSettingsChange);
     return () => {
       engine.off("settings:changed", handleSettingsChange);
@@ -34,6 +30,7 @@ export const SettingsProvider = ({
     () => ({
       settings,
       setSetting: (key, value) => engine.set(key, value),
+      loadPreset: (preset) => engine.loadPreset(preset), // Pass the function through
     }),
     [settings, engine],
   );
@@ -44,4 +41,3 @@ export const SettingsProvider = ({
     </SettingsContext.Provider>
   );
 };
-export { SettingsContext };

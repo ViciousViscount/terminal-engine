@@ -1,3 +1,5 @@
+// src/features/terminal/settings/context/settings.context.ts
+
 import { createContext } from "react";
 import { TerminalSettings } from "../types";
 
@@ -7,9 +9,9 @@ export interface SettingsContextValue {
     key: K,
     value: TerminalSettings[K],
   ) => void;
+  loadPreset: (preset: TerminalSettings) => void; // Add the new function
 }
 
-// This file only exports the context object, no components.
 export const SettingsContext = createContext<SettingsContextValue | undefined>(
   undefined,
 );

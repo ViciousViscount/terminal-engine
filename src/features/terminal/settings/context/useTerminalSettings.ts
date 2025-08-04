@@ -1,8 +1,11 @@
-import { useContext } from "react";
-import { SettingsContext } from "./SettingsProvider";
+// src/features/terminal/settings/context/useTerminalSettings.ts
 
-// This hook is the public facade for the React components.
-export const useTerminalSettings = () => {
+import { useContext } from "react";
+import { SettingsContext, SettingsContextValue } from "./settings.context";
+
+// This custom hook provides a convenient way to access the terminal settings.
+// It abstracts away the `useContext` call and provides a safety check.
+export const useTerminalSettings = (): SettingsContextValue => {
   const context = useContext(SettingsContext);
   if (context === undefined) {
     throw new Error(

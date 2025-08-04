@@ -5,12 +5,13 @@ import { useTerminal } from "../hooks/useTerminal";
 import { useTerminalEvents } from "../context/useTerminalEvents";
 import { useTerminalSettings } from "../settings/context/useTerminalSettings";
 import { NeuromorphicSurface } from "../../theme/components/NeuromorphicSurface";
-import { useTheme } from "../../theme/useTheme";
 import { NeuromorphicTheme } from "../../theme-shapers/neuromorphic";
 import TerminalInput from "./TerminalInput";
 import TerminalOutput from "./TerminalOutput";
 import { SettingsPanel } from "./SettingsPanel";
+import { oklch } from "culori";
 
+// THE FIX: Correctly defined SVG component
 const GearIcon = () => (
   <svg
     width="16"
@@ -31,20 +32,28 @@ const GearIcon = () => (
   </svg>
 );
 
+// THE FIX: Correctly defined helper function
+function getOklchValues(hex: string): string {
+  const color = oklch(hex);
+  if (!color) return "0 0 0";
+  return `${color.l.toFixed(3)} ${color.c.toFixed(3)} ${color.h?.toFixed(2) ?? 0}`;
+}
+
 export const TerminalWindow = () => {
   const { lines, engineState, submit, getPreviousCommand, getNextCommand } =
     useTerminal();
   const { dispatchEvent } = useTerminalEvents();
   const { settings } = useTerminalSettings();
-  const { activeTheme } = useTheme();
   const [showSettings, setShowSettings] = useState(false);
 
-  const surfaceColor =
-    (activeTheme as NeuromorphicTheme)?.surfaceColor || "#333";
+  const terminalStyleOverrides: Partial<NeuromorphicTheme> = {
+    ...settings.window,
+    interactions: false,
+  };
 
   return (
     <NeuromorphicSurface
-      styleOverrides={{ borderRadius: 16, concave: true, elevation: 5 }}
+      styleOverrides={terminalStyleOverrides}
       className="terminal-window-container"
     >
       <div
@@ -57,14 +66,17 @@ export const TerminalWindow = () => {
           fontFamily: settings.fontFamily,
           fontSize: `${settings.fontSize}px`,
           lineHeight: settings.lineHeight,
-          color: settings.textColor,
-          ["--terminal-base-color" as any]: settings.baseColor,
-          ["--terminal-accent-color" as any]: settings.accentColor,
+
+          ["--terminal-window-base-color" as any]: `oklch(${getOklchValues(settings.window.baseColor)})`,
+          ["--terminal-input-base-color" as any]: `oklch(${getOklchValues(settings.input.baseColor)})`,
+          ["--terminal-output-text-color" as any]: `oklch(${getOklchValues(settings.output.textColor)})`,
+          ["--terminal-output-accent-color" as any]: `oklch(${getOklchValues(settings.output.accentColor)})`,
         }}
       >
+        {/* THE FIX: Full, correct JSX for the header and settings button */}
         <NeuromorphicSurface
           styleOverrides={{
-            baseColor: surfaceColor,
+            baseColor: "var(--terminal-input-base-color)",
             borderRadius: 0,
             elevation: 0,
           }}
@@ -84,6 +96,7 @@ export const TerminalWindow = () => {
 
         <TerminalOutput lines={lines} />
 
+        {/* THE FIX: Full, correct JSX for the confirm button */}
         {engineState === "AWAITING_EVENT" && (
           <div className="p-2">
             <NeuromorphicSurface

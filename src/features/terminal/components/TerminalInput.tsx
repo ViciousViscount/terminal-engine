@@ -1,11 +1,11 @@
 // src/features/terminal/components/TerminalInput.tsx
 
 import React, { useState, useRef, useEffect } from "react";
-import { useTheme } from "../../theme/useTheme";
 import { NeuromorphicSurface } from "../../theme/components/NeuromorphicSurface";
 import { NeuromorphicTheme } from "../../theme-shapers/neuromorphic";
+import { useTerminalSettings } from "../settings/context/useTerminalSettings";
 
-// THE FIX #1: The `promptSymbol` prop is removed from the interface.
+// THE FIX #1: Define all the props the component expects to receive.
 interface TerminalInputProps {
   onSubmit: (text: string) => void;
   onArrowUp: () => string;
@@ -21,11 +21,9 @@ const TerminalInput: React.FC<TerminalInputProps> = ({
 }) => {
   const [value, setValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const { settings } = useTerminalSettings();
 
-  // THE FIX #2: Get the active theme to access its properties.
-  const { activeTheme } = useTheme();
-  // We can safely cast here and provide a fallback.
-  const promptSymbol = (activeTheme as NeuromorphicTheme)?.promptSymbol || ">";
+  const promptSymbol = settings.promptSymbol || ">";
 
   useEffect(() => {
     if (!disabled) {
@@ -33,6 +31,8 @@ const TerminalInput: React.FC<TerminalInputProps> = ({
     }
   }, [disabled]);
 
+  // THE FIX #2: Fully implement the keyboard event handler inside the component.
+  // This uses the props and event object, resolving all the "unused variable" errors.
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -49,10 +49,9 @@ const TerminalInput: React.FC<TerminalInputProps> = ({
     }
   };
 
+  // The input surface is now entirely driven by the user's settings.
   const inputSurfaceOverrides: Partial<NeuromorphicTheme> = {
-    concave: true,
-    elevation: 3,
-    borderRadius: 8,
+    ...settings.input,
   };
 
   return (
@@ -60,8 +59,14 @@ const TerminalInput: React.FC<TerminalInputProps> = ({
       styleOverrides={inputSurfaceOverrides}
       className="flex items-center p-2 m-2"
     >
-      {/* THE FIX #3: The prompt symbol now comes from the variable derived from the theme. */}
-      <span style={{ marginRight: "0.5em" }}>{promptSymbol}</span>
+      <span
+        style={{
+          marginRight: "0.5em",
+          color: "var(--terminal-output-accent-color)",
+        }}
+      >
+        {promptSymbol}
+      </span>
       <input
         ref={inputRef}
         type="text"
@@ -70,10 +75,11 @@ const TerminalInput: React.FC<TerminalInputProps> = ({
         onKeyDown={handleKeyDown}
         disabled={disabled}
         className="flex-1 bg-transparent border-none outline-none"
-        style={{ color: (activeTheme as NeuromorphicTheme)?.accent || "#eee" }}
+        style={{ color: "var(--terminal-output-text-color)" }}
       />
     </NeuromorphicSurface>
   );
 };
 
+// THE FIX #3: Ensure the component is exported correctly.
 export default TerminalInput;
